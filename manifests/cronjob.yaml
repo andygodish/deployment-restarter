@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: deployment-restarter
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: deployment-restarter
+        spec:
+          serviceAccountName: deployment-restarter
+          containers:
+          - name: restarter
+            image: andygodish/deployment-restarter:latest
+            # If you need to pass arguments or environment variables to your container, uncomment and adjust the following lines:
+            # args:
+            #   - arg1
+            #   - arg2
+            # env:
+            #   - name: ENV_VAR_NAME
+            #     value: "value"
+          restartPolicy: OnFailure  # Adjust if needed, but for CronJobs, 'Never' or 'OnFailure' are typically used
+  # Additional CronJob settings like concurrency policy and failed job history limit can be configured here
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
